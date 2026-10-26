@@ -1,0 +1,35 @@
+{
+  "name": "dsh-elysia-tts",
+  "version": "0.8.0",
+  "description": "爱莉希雅音色朗读：把 DSH 里说完的每一轮回复，用本地 GPT-SoVITS（爱莉希雅 V2 模型）流式念出来；选中文字右键即可朗读，8 档语气 + 39 条情绪参考音 + 静音裁剪",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/helpers.test.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [],
+      "external": []
+    }
+  }
+}

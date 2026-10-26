@@ -1,0 +1,11 @@
+node_modules/
+logs/
+.bak-*/
+.backup/
+*.log
+.DS_Store
+Thumbs.db
+.mplconfig/
+*.wav
+*.pth
+*.ckpt
