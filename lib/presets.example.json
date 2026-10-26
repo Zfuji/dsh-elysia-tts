@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "dir": "D:\\GPT-SoVITS\\refs",
+  "presets": [
+    {
+      "id": "p01",
+      "emotion": "普通",
+      "label": "示例 · 普通",
+      "text": "这行填这段参考音对应的台词，必须和音频逐字一致。",
+      "file": "ref-normal.wav",
+      "dur": 5.0
+    },
+    {
+      "id": "p02",
+      "emotion": "开心",
+      "label": "示例 · 开心",
+      "text": "开心的参考音台词。",
+      "file": "ref-happy.wav",
+      "dur": 4.5
+    },
+    {
+      "id": "p03",
+      "emotion": "撒娇",
+      "label": "示例 · 撒娇",
+      "text": "撒娇的参考音台词。",
+      "file": "ref-sweet.wav",
+      "dur": 4.8
+    }
+  ]
+}
