@@ -1,6 +1,27 @@
 # dsh-elysia-tts
 
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 给 DeepSeek Harness 的「爱莉希雅音色朗读」插件。宿主半边：盯住活着的会话 → 每说完一整轮 → 切成句子 → 送本地 GPT-SoVITS 合成 → 用 ffplay 在本机放出来。
+
+> 只发布代码。模型权重、参考音和 `lib/presets.json` 不随仓库分发，需要自备（见「参考音预设」）。角色音色请仅限个人使用。
+
+## 安装
+
+在 DSH 的 profile（`%DSH_HOME%\profiles\<名字>\package.json`）里加依赖并把它加进 bundle 列表：
+
+```jsonc
+{
+  "dependencies": {
+    "dsh-elysia-tts": "https://codeload.github.com/Zfuji/dsh-elysia-tts/tar.gz/refs/heads/main"
+  },
+  "dsh": { "profile": { "bundles": ["…", "dsh-elysia-tts"] } }
+}
+```
+
+装好重启 DSH，右下角会出现 🐳 按钮。本地开发时也可以直接 `link:D:/path/to/dsh-elysia-tts`。
+
+前置条件：一份 GPT-SoVITS 整合包、你自己的音色权重、`ffplay`（放 PATH 里）、以及 `lib/presets.json`（从 `lib/presets.example.json` 复制一份来填）。
 
 ## 它怎么决定念什么
 
