@@ -1,5 +1,6 @@
 # dsh-elysia-tts
 
+[![test](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml/badge.svg)](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 给 DeepSeek Harness 的「爱莉希雅音色朗读」插件。宿主半边：盯住活着的会话 → 每说完一整轮 → 切成句子 → 送本地 GPT-SoVITS 合成 → 用 ffplay 在本机放出来。
