@@ -1,0 +1,30 @@
+name: 功能建议
+description: 想加的语气、播放策略、接口或工程改进
+title: '[feat] '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 想解决什么
+      description: 描述场景，而不是直接给方案
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 你想到的做法（可选）
+      description: 比如「按句检测语言」「播放端 atempo 自适应」「多角色预设」
+  - type: textarea
+    id: tradeoff
+    attributes:
+      label: 代价 / 风险（可选）
+      description: 比如「会让首声更晚」「需要重新训练模型」
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: 涉及范围
+      options:
+        - label: 宿主半边（会话、合成、播放、接口）
+        - label: 网页半边（🐳 控制台、右键菜单）
+        - label: 文档 / CI / 工程

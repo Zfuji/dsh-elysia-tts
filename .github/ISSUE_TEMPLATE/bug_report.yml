@@ -1,0 +1,46 @@
+name: Bug 报告
+description: 朗读不出来、卡顿、崩溃、配置异常等
+title: '[bug] '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先确认：`npm test` 能过、`lib/presets.json` 已按 `presets.example.json` 填好、GPT-SoVITS 能在 `http://127.0.0.1:9880/docs` 打开。
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+      description: 实际表现 + 期望表现
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 重启 DSH
+        2. 让助手回一句 100 字以上的话
+        3. 听到第 2 句后卡住 10 秒
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: 环境
+      description: 操作系统、DSH 版本、Node 版本、ffplay 路径、有没有独显
+      placeholder: Windows 11 / DSH x.y.z / Node 22.x / ffplay 在 PATH / 无独显
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: DSH 控制台里 `[爱莉希雅朗读]` 开头的输出，以及 `tts-api.err.log` 的尾部
+      render: text
+  - type: textarea
+    id: config
+    attributes:
+      label: 配置（可选）
+      description: 配置文件 %DSH_HOME%\elysia-tts.json（**请把本机路径和台词打码**）
+      render: json

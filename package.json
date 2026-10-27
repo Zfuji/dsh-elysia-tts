@@ -1,6 +1,6 @@
 {
   "name": "dsh-elysia-tts",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "爱莉希雅音色朗读：把 DSH 里说完的每一轮回复，用本地 GPT-SoVITS 流式念出来；选中文字右键即可朗读，8 档语气 + 情绪参考音 + 静音裁剪",
   "license": "MIT",
   "repository": {
@@ -30,13 +30,19 @@
     "lib",
     "cordis.patch.yml",
     "README.md",
-    "ACKNOWLEDGMENTS.md"
+    "README.en.md",
+    "ACKNOWLEDGMENTS.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md"
   ],
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test test/helpers.test.mjs test/integration.test.mjs"
+    "test": "node --test test/helpers.test.mjs test/integration.test.mjs",
+    "lint": "oxlint lib test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dsh": {
     "bundle": {
@@ -47,5 +53,9 @@
       "inject": [],
       "external": []
     }
+  },
+  "devDependencies": {
+    "oxlint": "^1.90.0",
+    "prettier": "^3.9.10"
   }
 }

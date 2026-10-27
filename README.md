@@ -2,8 +2,13 @@
 
 [![test](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml/badge.svg)](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![node](https://img.shields.io/badge/node-%E2%89%A522-339933.svg)](package.json)
+
+[中文](README.md) | [English](README.en.md)
 
 给 DeepSeek Harness 的「爱莉希雅音色朗读」插件。宿主半边：盯住活着的会话 → 每说完一整轮 → 切成句子 → 送本地 GPT-SoVITS 合成 → 用 ffplay 在本机放出来。
+
+![🐳 控制台与右键菜单](docs/panel.png)
 
 > 只发布代码。模型权重、参考音和 `lib/presets.json` 不随仓库分发，需要自备（见「参考音预设」）。角色音色请仅限个人使用。
 
@@ -178,16 +183,23 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 ## 开发
 
 ```bash
-# 1) 准备自己的参考音清单（不入库）
-cp lib/presets.example.json lib/presets.json
+npm ci                                   # 只装 oxlint / prettier
+cp lib/presets.example.json lib/presets.json   # 填自己的参考音与台词
 
-# 2) 跑测试
-#    helpers：切句 / 预算 / 清理 / 扫描器 / 预设库 / 裁静音 / 静音压缩
-#    integration：短回复整段 / 长回复流式 / 失败重试 / 同源鉴权 / 音量
-npm test
+npm test          # helpers + integration，共 20 个用例
+npm run lint      # oxlint，要求 0 warning
+npm run format:check
 ```
 
+代码结构：`index.js`（配置 / 引擎生命周期 / 队列 / 接线）、`text.js`（纯文本）、`scanner.js`（会话扫描）、`player.js`（ffplay）、`tts.js`（整段 / 流式 / 逐句 + 缓存 + 重试）、`routes.js`（本机接口）、`client.js`（网页半边）。细节见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
 宿主半边的改动需要重启 DSH 才生效；网页半边（`lib/client.js`）的 bundle 也是启动时打包的，所以同样重启一次最稳——只有本地开着 `pnpm run dev:web` 时才会热更新。
+
+## 参与
+
+- 版本记录：[CHANGELOG.md](CHANGELOG.md)（打 `v*` tag 会自动生成 Release）
+- 贡献指南与代码结构：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 来源与许可边界：[ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md)
 
 ## 致谢
 

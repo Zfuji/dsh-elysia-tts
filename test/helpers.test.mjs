@@ -1,4 +1,4 @@
-// 只测纯函数和扫描器：这两块是「会不会念错」的核心，且不需要 DSH 运行时。
+﻿// 只测纯函数和扫描器：这两块是「会不会念错」的核心，且不需要 DSH 运行时。
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
@@ -71,7 +71,7 @@ test('预设库：id 唯一、文字/文件非空、时长 3–7s、文件都在
   for (const p of list) {
     assert.ok(p.id && p.file && p.text && p.emotion, '缺字段：' + JSON.stringify(p))
     assert.ok(p.dur >= 3 && p.dur <= 7, `${p.id} 时长越界：${p.dur}`)
-    assert.ok(!/^【/.test(p.text), `${p.id} 的 text 还带着情绪标签`)
+    assert.ok(!p.text.startsWith('【'), `${p.id} 的 text 还带着情绪标签`)
     // 只有本机真实清单才检查音频是否存在；公开仓库里只带示例
     if (own && existsSync(db.dir)) {
       assert.ok(existsSync(join(db.dir, p.file)), `${p.id} 找不到参考音：${p.file}`)
@@ -87,7 +87,7 @@ function fakeSession(id, events, header = {}) {
     get seq() {
       return events.length
     },
-    snapshotEvents: (from) => events.slice(from),
+    snapshotEvents: (from) => events.slice(from)
   }
 }
 
@@ -99,7 +99,7 @@ test('去不能念的：代码块、链接、emoji 不念', () => {
     '```',
     '见 https://example.com/x 和 `inline`。',
     '![图](a.png)',
-    '🐳 出发吧',
+    '🐳 出发吧'
   ].join('\n')
   const out = 去不能念的(raw)
   assert.equal(out.includes('https'), false)
@@ -145,9 +145,12 @@ test('取预算：没有标点的超长输入也不越界', () => {
 test('扫描器：一轮结束后只念最后一条有文字的助手消息', () => {
   const events = []
   const seen = []
-  const scan = createScanner((text, id, turn) => seen.push({ text, id, turn }), (e) => {
-    throw e
-  })
+  const scan = createScanner(
+    (text, id, turn) => seen.push({ text, id, turn }),
+    (e) => {
+      throw e
+    }
+  )
   const session = fakeSession('s1', events)
 
   events.push({ type: 'turn/start', seq: 0, data: { turn: 1 } })
@@ -179,12 +182,15 @@ test('扫描器：会话重启（seq 回退）后重新记水位，不念旧账'
   const events = [
     { type: 'turn/start', seq: 0, data: { turn: 1 } },
     { type: 'assistant/message', seq: 1, data: { turn: 1, step: 1, message: { content: [{ type: 'text', text: '旧内容' }] } } },
-    { type: 'turn/end', seq: 2, data: { turn: 1, reason: { kind: 'completed' } } },
+    { type: 'turn/end', seq: 2, data: { turn: 1, reason: { kind: 'completed' } } }
   ]
   const seen = []
-  const scan = createScanner((text) => seen.push(text), (e) => {
-    throw e
-  })
+  const scan = createScanner(
+    (text) => seen.push(text),
+    (e) => {
+      throw e
+    }
+  )
   const session = fakeSession('s1', events)
   scan([session])
   assert.deepEqual(seen, [], '首次扫到已有历史不念')

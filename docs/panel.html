@@ -1,0 +1,230 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>dsh-elysia-tts 控制台预览</title>
+    <style>
+      :root {
+        --dsw-alias-bg-base: #ffffff;
+        --dsw-alias-label-primary: #1f2329;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+      }
+      body {
+        background: radial-gradient(circle at 20% 0%, #ffe9f2 0%, #f4f6fb 45%, #eef1f7 100%);
+        display: grid;
+        place-items: center;
+      }
+      .stage {
+        position: relative;
+        width: 660px;
+        height: 560px;
+      }
+      /* 与 lib/client.js 里的 CSS 保持一致 */
+      .dsh-elysia-fab {
+        position: absolute;
+        right: 6px;
+        bottom: 12px;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        font-size: 22px;
+        line-height: 1;
+        background: rgba(255, 236, 244, 0.95);
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+      }
+      .dsh-elysia-fab[data-playing='true'] {
+        animation: dsh-elysia-pulse 1.4s ease-in-out infinite;
+      }
+      @keyframes dsh-elysia-pulse {
+        0%,
+        100% {
+          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+        }
+        50% {
+          box-shadow:
+            0 0 0 8px rgba(255, 150, 190, 0.25),
+            0 4px 18px rgba(0, 0, 0, 0.18);
+        }
+      }
+      .dsh-elysia-panel {
+        position: absolute;
+        right: 6px;
+        bottom: 70px;
+        width: 308px;
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--dsw-alias-bg-base);
+        color: var(--dsw-alias-label-primary);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.22);
+        font-size: 13px;
+        line-height: 1.6;
+        border: 1px solid rgba(127, 127, 127, 0.18);
+      }
+      .dsh-elysia-panel h4 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .dsh-elysia-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 6px 0;
+        align-items: center;
+      }
+      .dsh-elysia-row span:first-child {
+        opacity: 0.7;
+        white-space: nowrap;
+      }
+      .dsh-elysia-btn {
+        border: 1px solid rgba(127, 127, 127, 0.25);
+        background: transparent;
+        color: inherit;
+        border-radius: 8px;
+        padding: 4px 10px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .dsh-elysia-btn[data-on='true'] {
+        background: rgba(255, 150, 190, 0.22);
+        border-color: rgba(255, 120, 170, 0.5);
+      }
+      .dsh-elysia-panel select {
+        max-width: 168px;
+        font-size: 12px;
+        padding: 3px 6px;
+        border-radius: 7px;
+        border: 1px solid rgba(127, 127, 127, 0.25);
+        background: transparent;
+        color: inherit;
+      }
+      .dsh-elysia-hint {
+        opacity: 0.55;
+        font-size: 11.5px;
+        margin-top: 8px;
+      }
+      .dsh-elysia-menu {
+        position: absolute;
+        left: 6px;
+        bottom: 96px;
+        min-width: 186px;
+        padding: 5px;
+        border-radius: 10px;
+        background: var(--dsw-alias-bg-base);
+        color: var(--dsw-alias-label-primary);
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.24);
+        border: 1px solid rgba(127, 127, 127, 0.18);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .dsh-elysia-menu button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .dsh-elysia-menu button:first-child {
+        background: rgba(127, 127, 127, 0.14);
+      }
+      .dsh-elysia-toast {
+        position: absolute;
+        left: 50%;
+        bottom: 8px;
+        transform: translateX(-50%);
+        padding: 7px 14px;
+        border-radius: 999px;
+        background: rgba(31, 35, 41, 0.88);
+        color: #fff;
+        font-size: 12.5px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      }
+      .dsh-elysia-err {
+        color: #d4380d;
+        font-size: 11.5px;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="dsh-elysia-panel">
+        <h4><span>🐳 爱莉希雅朗读</span><button class="dsh-elysia-btn">收起</button></h4>
+        <div class="dsh-elysia-row">
+          <span>自动朗读</span><button class="dsh-elysia-btn" data-on="true">开</button>
+        </div>
+        <div class="dsh-elysia-row"><span>引擎</span><span>就绪（爱莉希雅）</span></div>
+        <div class="dsh-elysia-row"><span>现在</span><span>正在出声</span></div>
+        <div class="dsh-elysia-row">
+          <span>参考音</span>
+          <select>
+            <option>呀，我对你这样可爱的小朋友…（5.5s）</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row">
+          <span>语气</span>
+          <select>
+            <option>撒娇</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row">
+          <span>音色档</span>
+          <select>
+            <option>e24 · 学得更久</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row">
+          <span>语速</span>
+          <select>
+            <option>1.0 正常</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row">
+          <span>每轮念</span>
+          <select>
+            <option>150 字</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row">
+          <span>音量</span>
+          <select>
+            <option>80</option>
+          </select>
+        </div>
+        <div class="dsh-elysia-row" style="justify-content: flex-end; gap: 8px">
+          <button class="dsh-elysia-btn">试听</button>
+          <button class="dsh-elysia-btn">停止</button>
+        </div>
+        <div class="dsh-elysia-hint">
+          选中文字右键即可朗读；Ctrl+Shift+R 读选中内容，没有选中时表示停止。声音本地合成，不联网、不花钱。
+        </div>
+      </div>
+
+      <div class="dsh-elysia-menu">
+        <button>🐳 朗读选中（21 字）</button>
+        <button>⏹ 停止朗读</button>
+        <button>📋 复制选中</button>
+      </div>
+
+      <div class="dsh-elysia-toast">已送去朗读（21 字）</div>
+
+      <button class="dsh-elysia-fab" data-playing="true">🐳</button>
+    </div>
+  </body>
+</html>
