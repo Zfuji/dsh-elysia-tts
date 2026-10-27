@@ -47,15 +47,18 @@
 - 在输入框 / 文本域 / contenteditable 里右键**不拦截**（那里更需要复制粘贴）；
 - 点空白处、滚动、按 Esc、切窗口都会收起菜单；
 - 每次操作底部弹一条小提示（已送去朗读 / 已停止 / 已复制）。
+- 快捷键 **Ctrl+Shift+R**：有选中就读选中，没选中就停止。
 
 ## 延迟是怎么压的
 
 CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–2.0**，这是物理墙。插件能做的是别在墙上再自己加延迟：
 
-1. **流式播放（默认开启）**：一次请求内部按标点切段（`cut5`），边生成边推进**同一个** ffplay。实测首段 4.6 秒就到（逐句模式要 13.5 秒才开口），只付一次每请求固定开销、只起一个播放器。
-2. **静音压缩**：模型每段自带 ~0.45 秒尾静音，段段累加就是死气。流式路径把超过 `maxSilenceMs`（默认 200ms）的连续静音压短；逐句路径用 `裁尾静音` 剪掉 wav 尾巴（实测 24.1s → 22.7s 音频）。
-3. **网络读满、播放器自己消化**：读网络不 `await` 播放器，否则「播放慢 → TCP 反压 → 生成也慢」，实测会把 40 秒的活儿拖成 50 秒。
-4. **语气档默认 `stable`**：`temperature=0.8 / top_k=15 / top_p=0.85`。想换回原来的听感，控制台里切「生动」即可。
+1. **短回复整段合成**：≤ `shortReplyChars`（默认 60 字）的回复一次合成整段再播，段间零空隙；长回复才走流式。一两句话时听感最好。
+2. **流式播放**：一次请求内部按标点切段（`cut5`），边生成边推进**同一个** ffplay。实测首段 4.6 秒就到（逐句模式要 13.5 秒才开口），只付一次每请求固定开销、只起一个播放器。
+3. **静音压缩**：模型每段自带 ~0.45 秒尾静音，段段累加就是死气。流式路径把超过 `maxSilenceMs`（默认 200ms）的连续静音压短；整段/逐句路径用 `裁尾静音` 剪掉 wav 尾巴。
+4. **`fragment_interval` 0.3 → 0.05**：服务端在 cut5 每段之间会**插入 0.3 秒静音**。同一段四句话实测：总音频 15.36s → 12.66s，段间停顿 4.81s → 2.84s。
+5. **网络读满、播放器自己消化**：读网络不 `await` 播放器，否则「播放慢 → TCP 反压 → 生成也慢」，实测会把 40 秒的活儿拖成 50 秒。
+6. **语气档默认 `stable`**：`temperature=0.8 / top_k=15 / top_p=0.85`。想换回原来的听感，控制台里切「生动」即可。
 
 `/stop` 用「代号 + AbortController」停播放、清队列、取消在飞的请求。
 
@@ -126,6 +129,10 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 | `maxChars` | 每轮最多念多少字（默认 150；RTF>1 时调到 80 会明显更顺） |
 | `trim` | 超长回复取哪头：`"tail"`（默认，念结论）/ `"head"`（念开场） |
 | `streaming` | 是否流式播放（默认 `true`）。关掉退回「逐句请求 + 预取」，开口更晚但每句更完整 |
+| `shortReplyChars` | 这么短的回复整段合成再播（默认 60 字），段间零空隙；`0` 关闭 |
+| `fragmentInterval` | 服务端 cut5 段间插入的静音秒数（默认 `0.05`）。API 默认 0.3，段段累加就是死气 |
+| `volume` | 播放音量 0–100（默认 100），ffplay `-volume` |
+| `sameSiteOnly` | 只接受同源请求（默认 `true`），挡掉别的小网页用 `<img>` 触发朗读 |
 | `trimSilence` / `maxSilenceMs` | 是否压缩超长静音（默认开，200ms）。静音太长听着像掉线 |
 | `sampleRate` | 合成采样率，v2 模型固定 `32000`。流式 PCM 没有文件头，必须和模型一致 |
 | `gptWeights` / `sovitsWeights` | GPT / SoVITS 模型路径；`sovitsBase` 只有 LoRA 模型才需要（填底模） |
@@ -140,14 +147,16 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 
 ## 本机接口
 
-- `GET  /elysia-tts/status` 状态（`queue` / `spoken` / `dropped` / `cacheHits` / `style` / `lastError` …）
+只监听 `127.0.0.1`，并且默认**只接受同源请求**（跨站的 `Sec-Fetch-Site` / `Origin` 对不上会回 403），避免别的小网页用 `<img src="…/say?text=">` 让她念奇怪的东西。
+
+- `GET  /elysia-tts/status` 状态（`queue` / `spoken` / `dropped` / `cacheHits` / `style` / `volume` / `lastError` …）
 - `POST /elysia-tts/say {"text":"…"}` 念一句；加 `"full": true` 则不按每轮字数截断（右键朗读走这条）
 - `POST /elysia-tts/stop` 停止播放 + 清队列
 - `POST /elysia-tts/config {…}` 改配置（立刻生效并落盘）
 - `POST /elysia-tts/auto` 开关自动朗读
 - `POST /elysia-tts/warmup` 预热引擎
 - `GET  /elysia-tts/presets` 参考音/音色档列表
-- `POST /elysia-tts/preset {"ref":"p01"}` / `{"style":"lively"}` 切换
+- `POST /elysia-tts/preset {"ref":"p01"}` / `{"style":"lively"}` / `{"volume":60}` 切换
 
 ## 缓存
 
@@ -172,7 +181,9 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 # 1) 准备自己的参考音清单（不入库）
 cp lib/presets.example.json lib/presets.json
 
-# 2) 跑单测：切句 / 预算 / 清理 / 扫描器 / 预设库 / 裁静音 / 静音压缩
+# 2) 跑测试
+#    helpers：切句 / 预算 / 清理 / 扫描器 / 预设库 / 裁静音 / 静音压缩
+#    integration：短回复整段 / 长回复流式 / 失败重试 / 同源鉴权 / 音量
 npm test
 ```
 
