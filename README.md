@@ -178,6 +178,16 @@ npm test
 
 宿主半边的改动需要重启 DSH 才生效；网页半边（`lib/client.js`）的 bundle 也是启动时打包的，所以同样重启一次最稳——只有本地开着 `pnpm run dev:web` 时才会热更新。
 
+## 致谢
+
+本插件站在别人的肩膀上，完整来源与许可边界见 **[ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md)**：
+
+- **GPT-SoVITS**（MIT）：合成引擎，`/tts` 的切段与语言约定都来自它。
+- **FFmpeg / ffplay**：播放与音频分析。
+- **DeepSeek Harness**：插件 API（会话、Web 服务、客户端模块加载器）。
+- 角色「爱莉希雅」与音色素材版权归 **miHoYo / HoYoverse** 及原配音演员，模型与参考音不随仓库分发。
+
 ## 许可
 
-MIT（插件本体）。模型、参考音与音色素材不随仓库分发，请自行准备并确认你有权使用；角色音色仅限个人使用，别商用、别二次传播。
+MIT（插件本体，见 [LICENSE](LICENSE)）。模型、参考音与音色素材不随仓库分发，请自行准备并确认你有权使用；角色音色仅限个人使用，别商用、别二次传播。第三方组件的许可各自独立，详见 [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md)。
+
