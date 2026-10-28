@@ -39,7 +39,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test test/helpers.test.mjs test/integration.test.mjs",
+    "test": "node --test --test-concurrency=1 test/helpers.test.mjs test/integration.test.mjs",
     "lint": "oxlint lib test",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

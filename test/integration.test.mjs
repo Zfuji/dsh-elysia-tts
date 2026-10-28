@@ -3,10 +3,10 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const home = mkdtempSync(join(tmpdir(), 'elysia-it-'))
+const home = mkdtempSync(join(dirname(fileURLToPath(import.meta.url)), '.tmp-'))
 process.env.DSH_HOME = home
 writeFileSync(
   join(home, 'elysia-tts.json'),

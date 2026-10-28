@@ -12,3 +12,4 @@ Thumbs.db
 
 # 真实的参考音清单（含本机路径/台词），只提交 presets.example.json
 lib/presets.json
+test/.tmp-*
