@@ -1,4 +1,4 @@
-﻿// 集成测试：用假 fetch + `process.execPath` 当播放器，覆盖
+// 集成测试：用假 fetch + `process.execPath` 当播放器，覆盖
 // 短回复整段 / 长回复流式 / 失败重试 / 同源鉴权 / 音量 / 新配置字段。
 import test from 'node:test'
 import assert from 'node:assert/strict'

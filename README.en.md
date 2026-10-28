@@ -1,4 +1,4 @@
-﻿# dsh-elysia-tts
+# dsh-elysia-tts
 
 [![test](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml/badge.svg)](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)

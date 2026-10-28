@@ -1,4 +1,4 @@
-﻿# Changelog
+# Changelog
 
 所有重要改动都记在这里。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 SemVer。
 

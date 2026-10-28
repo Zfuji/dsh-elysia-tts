@@ -1,4 +1,4 @@
-﻿// 只测纯函数和扫描器：这两块是「会不会念错」的核心，且不需要 DSH 运行时。
+// 只测纯函数和扫描器：这两块是「会不会念错」的核心，且不需要 DSH 运行时。
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
@@ -215,4 +215,24 @@ test('切块：长文按句子分组，不切在句子中间', () => {
 test('切块：短文本只出一块', () => {
   const chunks = 切块('你好呀。今天也要开心。', 600)
   assert.equal(chunks.length, 1)
+})
+
+test('仓库文件不带 UTF-8 BOM（BOM 会让 DSH 的 JSON.parse 直接失败）', () => {
+  const files = [
+    'package.json',
+    'lib/index.js',
+    'lib/client.js',
+    'lib/tts.js',
+    'lib/routes.js',
+    'lib/player.js',
+    'lib/text.js',
+    'lib/scanner.js',
+    'test/helpers.test.mjs',
+    'test/integration.test.mjs'
+  ]
+  for (const file of files) {
+    const buf = readFileSync(new URL(`../${file}`, import.meta.url))
+    const hasBom = buf.length >= 3 && buf[0] === 0xef && buf[1] === 0xbb && buf[2] === 0xbf
+    assert.ok(!hasBom, `${file} 带 UTF-8 BOM`)
+  }
 })
