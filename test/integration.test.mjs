@@ -8,7 +8,15 @@ import { join } from 'node:path'
 
 const home = mkdtempSync(join(tmpdir(), 'elysia-it-'))
 process.env.DSH_HOME = home
-writeFileSync(join(home, 'elysia-tts.json'), JSON.stringify({ ffplay: process.execPath, auto: false, api: 'http://127.0.0.1:1' }), 'utf8')
+writeFileSync(
+  join(home, 'elysia-tts.json'),
+  JSON.stringify({
+    ffplay: process.platform === 'win32' ? 'C:\\\\Windows\\\\System32\\\\cmd.exe' : '/bin/true',
+    auto: false,
+    api: 'http://127.0.0.1:1'
+  }),
+  'utf8'
+)
 
 const requests = []
 let failNextTTS = false
