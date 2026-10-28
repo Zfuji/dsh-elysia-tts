@@ -1,8 +1,16 @@
-# Changelog
+﻿# Changelog
 
 所有重要改动都记在这里。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，版本号遵循 SemVer。
 
 ## [Unreleased]
+
+## [0.11.0] - 2026-10-28
+
+### Added
+
+- **读文件**：面板选一个纯文本文件（txt/md/json/csv/log/srt/vtt/yaml/html），宿主切块排队朗读；/status 暴露进度，停止 清空任务；单次上限 eadMaxChars（默认 20000 字），单块 eadChunkChars（默认 600）
+- POST /elysia-tts/read 接口；切块() 纯函数与对应单测
+- README 中英文补「读文件」章节，控制台截图更新
 
 ## [0.10.0] - 2026-10-27
 

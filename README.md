@@ -1,4 +1,4 @@
-# dsh-elysia-tts
+﻿# dsh-elysia-tts
 
 [![test](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml/badge.svg)](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -53,6 +53,19 @@
 - 点空白处、滚动、按 Esc、切窗口都会收起菜单；
 - 每次操作底部弹一条小提示（已送去朗读 / 已停止 / 已复制）。
 - 快捷键 **Ctrl+Shift+R**：有选中就读选中，没选中就停止。
+
+## 读文件
+
+面板里点「选择文件…」，选一个纯文本文件（txt / md / json / csv / log / srt / vtt / yaml / html），插件会：
+
+1. 在浏览器里读出文字（上限 4MB），交给宿主；
+2. 宿主机清理后按句子切成约 600 字一块（eadChunkChars），逐块排队朗读；
+3. 面板「现在」显示 读文件 3/12，读完显示「读完「文件名」」；
+4. 「停止」会清掉整个任务。
+
+单次最多读 eadMaxChars（默认 20000 字，约 25 分钟合成时间），超出会截断并在提示里标出。读文件的任务**不参与**自动朗读的「队列满丢最早」，所以不会念到一半被新回复挤掉。
+
+> Word / PDF 暂不支持：请先另存为 .txt 或复制成文本。原因是浏览器侧无法可靠抽文本，而宿主不想为此引入解析依赖。
 
 ## 延迟是怎么压的
 
@@ -135,6 +148,7 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 | `trim` | 超长回复取哪头：`"tail"`（默认，念结论）/ `"head"`（念开场） |
 | `streaming` | 是否流式播放（默认 `true`）。关掉退回「逐句请求 + 预取」，开口更晚但每句更完整 |
 | `shortReplyChars` | 这么短的回复整段合成再播（默认 60 字），段间零空隙；`0` 关闭 |
+| `readMaxChars` / `readChunkChars` | 读文件单次上限（默认 20000 字）/ 每块字数（默认 600） |
 | `fragmentInterval` | 服务端 cut5 段间插入的静音秒数（默认 `0.05`）。API 默认 0.3，段段累加就是死气 |
 | `volume` | 播放音量 0–100（默认 100），ffplay `-volume` |
 | `sameSiteOnly` | 只接受同源请求（默认 `true`），挡掉别的小网页用 `<img>` 触发朗读 |
@@ -156,6 +170,7 @@ CPU 推理比播放慢，实测 **RTF（合成耗时 / 音频时长）≈ 1.6–
 
 - `GET  /elysia-tts/status` 状态（`queue` / `spoken` / `dropped` / `cacheHits` / `style` / `volume` / `lastError` …）
 - `POST /elysia-tts/say {"text":"…"}` 念一句；加 `"full": true` 则不按每轮字数截断（右键朗读走这条）
+- `POST /elysia-tts/read {"name":"a.txt","text":"…"}` 读文件：切块排队，进度看 `/status` 的 `read`
 - `POST /elysia-tts/stop` 停止播放 + 清队列
 - `POST /elysia-tts/config {…}` 改配置（立刻生效并落盘）
 - `POST /elysia-tts/auto` 开关自动朗读

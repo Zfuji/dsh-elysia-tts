@@ -22,7 +22,7 @@
       .stage {
         position: relative;
         width: 660px;
-        height: 560px;
+        height: 600px;
       }
       /* 与 lib/client.js 里的 CSS 保持一致 */
       .dsh-elysia-fab {
@@ -207,12 +207,15 @@
             <option>80</option>
           </select>
         </div>
+        <div class="dsh-elysia-row">
+          <span>读文件</span><span><button class="dsh-elysia-btn">选择文件…</button></span>
+        </div>
         <div class="dsh-elysia-row" style="justify-content: flex-end; gap: 8px">
           <button class="dsh-elysia-btn">试听</button>
           <button class="dsh-elysia-btn">停止</button>
         </div>
         <div class="dsh-elysia-hint">
-          选中文字右键即可朗读；Ctrl+Shift+R 读选中内容，没有选中时表示停止。声音本地合成，不联网、不花钱。
+          选中文字右键即可朗读；Ctrl+Shift+R 读选中内容，没有选中时表示停止。支持 txt / md / json / csv 等纯文本，Word / PDF 请先另存为文本。
         </div>
       </div>
 

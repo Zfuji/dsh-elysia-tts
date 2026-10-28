@@ -224,3 +224,38 @@ test.after(() => {
     rmSync(home, { recursive: true, force: true })
   } catch {}
 })
+
+test('读文件：切块排队，状态里有进度，stop 能清掉', async () => {
+  await call('/elysia-tts/stop', { method: 'POST' })
+  const text = '这是用来测试读文件功能的一段文字。'.repeat(80)
+  const r = await call('/elysia-tts/read', { method: 'POST', body: { name: '测试.txt', text } })
+  assert.equal(r.json.ok, true)
+  assert.ok(r.json.total >= 2, `应该切成多块：${r.json.total}`)
+  assert.equal(r.json.truncated, false)
+  const s = await status()
+  assert.equal(s.read.name, '测试.txt')
+  assert.equal(s.read.total, r.json.total)
+  await call('/elysia-tts/stop', { method: 'POST' })
+  const after = await status()
+  assert.equal(after.read, null)
+  assert.equal(after.queue, 0)
+})
+
+test('读文件：超过 readMaxChars 会截断并标记', async () => {
+  await call('/elysia-tts/stop', { method: 'POST' })
+  await call('/elysia-tts/config', { method: 'POST', body: { readMaxChars: 500 } })
+  const text = '长文截断测试。'.repeat(400)
+  const r = await call('/elysia-tts/read', { method: 'POST', body: { name: 'long.txt', text } })
+  assert.equal(r.json.ok, true)
+  assert.equal(r.json.truncated, true)
+  assert.ok(r.json.chars <= 500)
+  await call('/elysia-tts/stop', { method: 'POST' })
+  await call('/elysia-tts/config', { method: 'POST', body: { readMaxChars: 20000 } })
+})
+
+test('读文件：非 POST 被拒，空文本 400', async () => {
+  const get = await call('/elysia-tts/read')
+  assert.equal(get.code, 405)
+  const empty = await call('/elysia-tts/read', { method: 'POST', body: { name: 'a.txt', text: '   ' } })
+  assert.equal(empty.code, 400)
+})

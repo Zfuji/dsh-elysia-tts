@@ -1,4 +1,4 @@
-# dsh-elysia-tts
+﻿# dsh-elysia-tts
 
 [![test](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml/badge.svg)](https://github.com/Zfuji/dsh-elysia-tts/actions/workflows/test.yml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -95,6 +95,20 @@ Select any text → right-click → **read selection / stop / copy**. Or press *
 the selection, or stops when nothing is selected). The `/say` endpoint accepts `"full": true` to skip
 the per-turn character budget (capped at 2000 chars).
 
+## Reading a file
+
+Click **选择文件… (choose file)** in the panel and pick a plain-text file (txt / md / json / csv / log /
+srt / vtt / yaml / html). The client reads it in the browser (4 MB cap), the host cleans it, splits it
+into ~600-character chunks (eadChunkChars) and queues them one by one. The panel shows
+读文件 3/12 while it plays, and **停止** clears the whole job.
+
+One job is capped at eadMaxChars (default 20 000 characters ≈ 25 minutes of synthesis); anything
+beyond is truncated and flagged in the toast. File-reading chunks are **not** subject to the
+“drop the oldest when the queue is full” rule, so a new reply cannot evict them mid-file.
+
+> Word / PDF are not supported yet — save them as .txt first. Browser-side extraction is unreliable
+> and the host deliberately avoids adding a document-parsing dependency.
+
 ## Configuration
 
 `%DSH_HOME%\elysia-tts.json` — only the keys you want to override:
@@ -106,6 +120,7 @@ the per-turn character budget (capped at 2000 chars).
 | `trim` | `"tail"` (default) or `"head"` |
 | `streaming` | streaming playback (default true) |
 | `shortReplyChars` | replies up to this length are synthesized as one piece (default 60, 0 disables) |
+| `readMaxChars` / `readChunkChars` | file-reading cap (default 20 000 chars) / chunk size (default 600) |
 | `fragmentInterval` | silence inserted between server-side segments (default 0.05 s) |
 | `volume` | playback volume 0–100 |
 | `sameSiteOnly` | reject cross-site requests (default true) |
@@ -124,6 +139,7 @@ Only bound to `127.0.0.1`, same-origin by default (cross-site requests get 403).
 
 - `GET /elysia-tts/status`
 - `POST /elysia-tts/say {"text":"…","full":true}`
+- `POST /elysia-tts/read {"name":"a.txt","text":"…"}` — queue a file; progress in `/status` → `read`
 - `POST /elysia-tts/stop`
 - `POST /elysia-tts/config {…}`
 - `POST /elysia-tts/auto`, `POST /elysia-tts/warmup`

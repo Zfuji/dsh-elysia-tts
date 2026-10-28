@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { 切句, 取预算, 去不能念的, createScanner, 裁尾静音, 静音压缩 } from '../lib/index.js'
+import { 切句, 取预算, 去不能念的, 切块, createScanner, 裁尾静音, 静音压缩 } from '../lib/index.js'
 
 /** 造一段 32kHz/mono/s16 的 wav：samples 是振幅序列。 */
 function wav(samples, sr = 32000) {
@@ -198,4 +198,21 @@ test('扫描器：会话重启（seq 回退）后重新记水位，不念旧账'
   events.length = 0 // 会话被重建
   scan([session])
   assert.deepEqual(seen, [])
+})
+
+test('切块：长文按句子分组，不切在句子中间', () => {
+  const sentence = '这是一句用来测试分块的中文句子，长度大约二十个字左右。'
+  const text = sentence.repeat(40)
+  const chunks = 切块(text, 300)
+  assert.ok(chunks.length > 1, '应该被切成多块')
+  for (const chunk of chunks) {
+    assert.ok(chunk.length <= 300 + sentence.length, `块过长：${chunk.length}`)
+    assert.ok(chunk.endsWith('。'), `块应该停在句末：${chunk.slice(-6)}`)
+  }
+  assert.equal(chunks.join(''), text, '拼起来应该和原文一致')
+})
+
+test('切块：短文本只出一块', () => {
+  const chunks = 切块('你好呀。今天也要开心。', 600)
+  assert.equal(chunks.length, 1)
 })
